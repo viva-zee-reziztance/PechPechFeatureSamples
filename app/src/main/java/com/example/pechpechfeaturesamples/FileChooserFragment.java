@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 
 
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -133,37 +134,28 @@ public class FileChooserFragment extends Fragment {
     //  Return the output file path (the same if the input file bitrate is already low)
     private String compressVideo(String path)
     {
-        int br = VideoUtils.getBitRate(path);
-        int targetBitRate = 192000;
-
-        // Now magically set a bitrate
-        if (br > targetBitRate)
+        if (VideoUtils.shouldReEncode(path))
         {
-            // Create a temporary file inside APP storage ... need to delete it after use?
-            File appFilesDir = getContext().getFilesDir();
+            // Re-encode then!
+            VideoUtils vu = new VideoUtils();
+
+
+            File downLoadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
             String uuid = UUID.randomUUID().toString();
 
-            File file = new File( appFilesDir, uuid+".mp4");
+
+            File file = new File( downLoadDir, uuid+".mp4");
             String outputPath = file.getPath();
 
-            // Yes Aweful
-            if (VideoUtils.setBitRate(path, targetBitRate, outputPath))
-            {
-                // Now you need to read this file
-                return outputPath;
-            }
-            else
-            {
-                // Rerturn an empty string to show the file is written
-                return "";
-            }
 
+            return outputPath;
         }
         else
         {
-            // Nothing to do
             return path;
         }
+
+
 
 
     }
@@ -188,7 +180,16 @@ public class FileChooserFragment extends Fragment {
                         }
                         // this.editTextPath.setText(filePath);
                         // Now do the compression if required?
-                        compressVideo(filePath);
+
+                        // Actually couldnt play in android either (could be played in windows though)
+                        String outputData = compressVideo(filePath);
+
+                        Integer sourceBitRate = VideoUtils.getBitRate(filePath);
+                        Integer targetBitRate = VideoUtils.getBitRate(outputData);
+
+                        Log.i(LOG_TAG, "changed bitrate from " + Integer.toString(sourceBitRate) + ", to " + Integer.toString(targetBitRate) );
+
+
                     }
                 }
                 break;
