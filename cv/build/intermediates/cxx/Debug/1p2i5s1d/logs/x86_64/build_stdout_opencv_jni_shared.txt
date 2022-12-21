@@ -1,2 +1,0 @@
-ninja: Entering directory `C:\Users\sara-nima\Documents\src\PechPechFeatureSamples\cv\.cxx\Debug\1p2i5s1d\x86_64'
-ninja: no work to do.

@@ -132,9 +132,12 @@ public class FileChooserFragment extends Fragment {
 
     // ***************
     //  Return the output file path (the same if the input file bitrate is already low)
-    private String compressVideo(String path)
+    // ***************
+    //  Deprected funcs. work on it later
+
+    private String compressVideo(String inputPath)
     {
-        if (VideoUtils.shouldReEncode(path))
+        if (VideoUtils.shouldReEncode(inputPath))
         {
             // Re-encode then!
             VideoUtils vu = new VideoUtils();
@@ -144,24 +147,35 @@ public class FileChooserFragment extends Fragment {
             String uuid = UUID.randomUUID().toString();
 
 
+            /*
             File file = new File( downLoadDir, uuid+".mp4");
             String outputPath = file.getPath();
+
+             */
+
+            Log.w("", "REMOVE ME");
+            File file = new File( downLoadDir, "1.mp4");
+            if (file.exists())
+            {
+                file.delete();
+            }
+            String outputPath = file.getPath();
+
+            vu.reEncodeVideo(inputPath, outputPath);
+
 
 
             return outputPath;
         }
         else
         {
-            return path;
+            return inputPath;
         }
 
 
 
 
     }
-
-    // ***************
-    //  Deprected funcs. work on it later
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
