@@ -1,11 +1,16 @@
 package com.example.pechpechfeaturesamples;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.content.ClipData;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +40,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class FileChooserFragment extends Fragment {
@@ -47,7 +55,13 @@ public class FileChooserFragment extends Fragment {
 
     private static final String LOG_TAG = "AndroidExample";
 
+    public FileSelect delegate = null;
+
+    private static final int REQUEST_CODE_PICK = 1;
+    private static final int REQUEST_CODE_PICK_AUDIO = 5;
+
     // ***************
+
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 
@@ -60,158 +74,50 @@ public class FileChooserFragment extends Fragment {
 
             @Override
             public void onClick(View view) {
-                askPermissionAndBrowseFile();
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
+                        .setDataAndType(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, "video/*")
+                        .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                startActivityForResult(intent, REQUEST_CODE_PICK);
             }
 
         });
         return rootView;
     }
 
-    // ***************
-    private void askPermissionAndBrowseFile()  {
-        // With Android Level >= 23, you have to ask the user
-        // for permission to access External Storage.
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) { // Level 23
-
-            // Check if we have Call permission
-            int permisson = ActivityCompat.checkSelfPermission(this.getContext(),
-                    Manifest.permission.READ_EXTERNAL_STORAGE);
-
-            if (permisson != PackageManager.PERMISSION_GRANTED) {
-                // If don't have permission so prompt the user.
-                this.requestPermissions(
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        MY_REQUEST_CODE_PERMISSION
-                );
-                return;
-            }
-        }
-        this.doBrowseFile();
-    }
-
-    private void doBrowseFile()  {
-        Intent chooseFileIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        chooseFileIntent.setType("*/*");
-        // Only return URIs that can be opened with ContentResolver
-        chooseFileIntent.addCategory(Intent.CATEGORY_OPENABLE);
-
-        chooseFileIntent = Intent.createChooser(chooseFileIntent, "Choose a file");
-        startActivityForResult(chooseFileIntent, MY_RESULT_CODE_FILECHOOSER);
-    }
 
     // ***************
-    // When you have the request results
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        //
-        switch (requestCode) {
-            case MY_REQUEST_CODE_PERMISSION: {
-
-                // Note: If request is cancelled, the result arrays are empty.
-                // Permissions granted (CALL_PHONE).
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    Log.i( LOG_TAG,"Permission granted!");
-                    Toast.makeText(this.getContext(), "Permission granted!", Toast.LENGTH_SHORT).show();
-
-                    this.doBrowseFile();
-                }
-                // Cancelled or denied.
-                else {
-                    Log.i(LOG_TAG,"Permission denied!");
-                    Toast.makeText(this.getContext(), "Permission denied!", Toast.LENGTH_SHORT).show();
-                }
-                break;
-            }
-        }
-    }
-
-    // ***************
-    //  Return the output file path (the same if the input file bitrate is already low)
-    // ***************
-    //  Deprected funcs. work on it later
-
-    private String compressVideo(String inputPath)
-    {
-        if (VideoUtils.shouldReEncode(inputPath))
-        {
-            // Re-encode then!
-            VideoUtils vu = new VideoUtils();
-
-
-            File downLoadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            String uuid = UUID.randomUUID().toString();
-
-
-            /*
-            File file = new File( downLoadDir, uuid+".mp4");
-            String outputPath = file.getPath();
-
-             */
-
-            Log.w("", "REMOVE ME");
-            File file = new File( downLoadDir, "1.mp4");
-            if (file.exists())
-            {
-                file.delete();
-            }
-            String outputPath = file.getPath();
-
-            vu.reEncodeVideo(inputPath, outputPath);
-
-
-
-            return outputPath;
-        }
-        else
-        {
-            return inputPath;
-        }
-
-
-
-
-    }
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case MY_RESULT_CODE_FILECHOOSER:
-                if (resultCode == Activity.RESULT_OK ) {
-                    if(data != null)  {
-                        Uri fileUri = data.getData();
-                        Log.i(LOG_TAG, "Uri: " + fileUri);
-
-                        String filePath = null;
-                        try {
-                            filePath = FileUtils.getPath(this.getContext(),fileUri);
-                        } catch (Exception e) {
-                            Log.e(LOG_TAG,"Error: " + e);
-                            Toast.makeText(this.getContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
-                        }
-                        // this.editTextPath.setText(filePath);
-                        // Now do the compression if required?
-
-                        // Actually couldnt play in android either (could be played in windows though)
-                        String outputData = compressVideo(filePath);
-
-                        Integer sourceBitRate = VideoUtils.getBitRate(filePath);
-                        Integer targetBitRate = VideoUtils.getBitRate(outputData);
-
-                        Log.i(LOG_TAG, "changed bitrate from " + Integer.toString(sourceBitRate) + ", to " + Integer.toString(targetBitRate) );
-
-
-                    }
-                }
-                break;
-        }
+    public void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-    }
+        if (requestCode == REQUEST_CODE_PICK
+                && resultCode == RESULT_OK
+                && data != null) {
+            if (data.getClipData() != null) {
+                ClipData clipData = data.getClipData();
+                List<Uri> uris = new ArrayList<>();
+                for (int i = 0; i < clipData.getItemCount(); i++) {
+                    uris.add(clipData.getItemAt(i).getUri());
+                }
 
-    public String getPath()  {
-        return this.editTextPath.getText().toString();
+
+                delegate.selectedFiles(uris.toArray(new Uri[0]));
+                // transcode(uris.toArray(new Uri[0]));
+            } else if (data.getData() != null) {
+                // transcode(data.getData());
+                delegate.selectedFiles(data.getData());
+            }
+        }
+
+        /*
+        if (requestCode == REQUEST_CODE_PICK_AUDIO
+                && resultCode == RESULT_OK
+                && data != null
+                && data.getData() != null) {
+            mAudioReplacementUri = data.getData();
+            mAudioReplaceView.setText(mAudioReplacementUri.toString());
+
+        }
+        */
+
     }
 }

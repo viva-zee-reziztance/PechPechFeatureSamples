@@ -32,7 +32,7 @@ import android.util.Log;
 /**
  * Code for rendering a texture onto a surface using OpenGL ES 2.0.
  */
-class TextureRender {
+class TextureRenderer {
     private static final String TAG = "TextureRender";
     private static final int FLOAT_SIZE_BYTES = 4;
     private static final int TRIANGLE_VERTICES_DATA_STRIDE_BYTES = 5 * FLOAT_SIZE_BYTES;
@@ -54,7 +54,7 @@ class TextureRender {
     private int maPositionHandle;
     private int maTextureHandle;
 
-    public TextureRender() {
+    public TextureRenderer() {
         mTriangleVertices = ByteBuffer.allocateDirect( mTriangleVerticesData.length * FLOAT_SIZE_BYTES ).order( ByteOrder.nativeOrder() ).asFloatBuffer();
         mTriangleVertices.put( mTriangleVerticesData ).position( 0 );
         Matrix.setIdentityM( mSTMatrix, 0 );
