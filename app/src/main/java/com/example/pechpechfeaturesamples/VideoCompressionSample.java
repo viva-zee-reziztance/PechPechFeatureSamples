@@ -6,13 +6,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
-import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -32,20 +29,10 @@ import java.io.IOException;
 //      2)  AndroidManifest.xml
 // ***************
 
-//  Interface that we have selected a file
-interface FileSelect
-{
-    // Selected a file with the given path
-    public void selectedFile(String path);
-    public void selectedFiles(@NonNull Uri... uris);
-    public void cancelFileSelection();
-    public void permissionDenied();
-    public void errorSelectingFile(Exception e);
-}
 
-public class CompressionSample extends AppCompatActivity implements FileSelect, TranscoderListener {
+public class VideoCompressionSample extends AppCompatActivity implements FileSelect, TranscoderListener {
 
-    private FileChooserFragment fragment;
+    private FileChooserFragment fragment = null;
     private Button buttonShowInfo;
     private VideoUtils vu = new VideoUtils();
 
@@ -53,14 +40,12 @@ public class CompressionSample extends AppCompatActivity implements FileSelect, 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_compression_sample);
+        setContentView(R.layout.activity_video_compression_sample);
 
         // Add the file browser to the view
         FragmentManager fragmentManager = this.getSupportFragmentManager();
-        this.fragment = (FileChooserFragment) fragmentManager.findFragmentById(R.id.fragment_fileChooser);
+        this.fragment = (FileChooserFragment) fragmentManager.findFragmentById(R.id.fragment_vide_compression_file_chooser);
         this.fragment.delegate = this;
-
-        this.buttonShowInfo = this.findViewById(R.id.button_fileChooser_showInfo);
 
         vu.delegate = this;
 

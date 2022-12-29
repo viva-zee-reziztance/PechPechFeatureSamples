@@ -138,11 +138,27 @@ public class VideoUtils
     // https://github.com/natario1/Transcoder/blob/main/demo/src/main/java/com/otaliastudios/transcoder/demo/TranscoderActivity.java
     private void setAudioPolicy()
     {
+
+
+
         /*
-        // Think about this
-        boolean removeAudio = false;
+            // This failed ... debug why? maybe sample rate?
+            boolean removeAudio = false; // fails
+            // Or 2 as the setereo?
+            int channels = DefaultAudioStrategy.CHANNELS_AS_INPUT;
 
 
+            int sampleRate = 48000;
+
+            mTranscodeAudioStrategy = DefaultAudioStrategy.builder()
+                    .channels(channels)
+                    .sampleRate(sampleRate)
+                    .build();
+
+         */
+
+
+        boolean removeAudio = true;
         if (removeAudio) {
             mTranscodeAudioStrategy = new RemoveTrackStrategy();
         } else {
@@ -158,22 +174,22 @@ public class VideoUtils
                     .build();
         }
 
-         */
-        mTranscodeAudioStrategy = DefaultAudioStrategy.builder().build();
+
+
+        // mTranscodeAudioStrategy = DefaultAudioStrategy.builder().build();
 
     }
 
     // ***************
     private void setVideoPolicy()
     {
-        /*
         mTranscodeVideoStrategy = new DefaultVideoStrategy.Builder().addResizer(new PassThroughResizer())
                 .frameRate(DefaultVideoStrategy.DEFAULT_FRAME_RATE) //set the framerate
                 .keyFrameInterval(DEFAULT_IFRAME_INTERVAL_SEC)
                 .build();
 
-         */
-        mTranscodeVideoStrategy = new DefaultVideoStrategy.Builder().build();
+
+        // mTranscodeVideoStrategy = new DefaultVideoStrategy.Builder().build();
     }
 
 

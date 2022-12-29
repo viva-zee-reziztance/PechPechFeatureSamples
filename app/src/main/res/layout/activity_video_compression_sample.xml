@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:paddingLeft="5sp"
-android:paddingTop="5sp"
-android:paddingRight="5sp"
-android:paddingBottom="5sp"
-tools:context=".CompressionSample" >
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="5sp"
+    android:paddingTop="5sp"
+    android:paddingRight="5sp"
+    android:paddingBottom="5sp"
+    tools:context=".VideoCompressionSample" >
 
     <!--
 
@@ -17,7 +17,7 @@ tools:context=".CompressionSample" >
 
     <fragment
         android:name="com.example.pechpechfeaturesamples.FileChooserFragment"
-        android:id="@+id/fragment_fileChooser"
+        android:id="@+id/fragment_vide_compression_file_chooser"
         android:layout_width="0dp"
         android:layout_height="45dp"
         android:layout_marginStart="16dp"
@@ -29,7 +29,10 @@ tools:context=".CompressionSample" >
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+
+
+    <!--
+        <Button
         android:id="@+id/button_fileChooser_showInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -38,10 +41,7 @@ tools:context=".CompressionSample" >
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fragment_fileChooser" />
-</androidx.constraintlayout.widget.ConstraintLayout>
 
-
-    <!--
     <?xml version="1.0" encoding="utf-8"?>
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -59,3 +59,5 @@ tools:context=".CompressionSample" >
             tools:layout_editor_absoluteY="279dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
     -->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,9 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-//import org.opencv.android.*;
+
 
 
 public class MainActivity extends AppCompatActivity {
@@ -33,11 +32,17 @@ public class MainActivity extends AppCompatActivity {
 
     //  *******************
     public void selectFeatureSampleRowClick(View view) {
-        switch(view.getId()) {
+        int selectedID = view.getId();
+        switch(selectedID) {
             case R.id.compression:
                 // Open the compression Sample
-                startActivity(new Intent(this, CompressionSample.class));
+                startActivity(new Intent(this, VideoCompressionSample.class));
                 break;
+            case R.id.voice_change:
+                //startActivity(new Intent(this, com.example.pechpechfeaturesamples.VoiceChangeSample.class));
+                startActivity(new Intent(this, VoiceChangeSample.class));
+                break;
+
         }
     }
 }

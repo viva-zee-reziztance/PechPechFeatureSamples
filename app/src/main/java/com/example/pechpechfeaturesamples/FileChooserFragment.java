@@ -3,6 +3,7 @@ package com.example.pechpechfeaturesamples;
 import static android.app.Activity.RESULT_OK;
 
 import android.content.ClipData;
+import android.content.ContentResolver;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -53,6 +54,10 @@ public class FileChooserFragment extends Fragment {
     private Button buttonBrowse;
     private EditText editTextPath;
 
+    // Are we selecing video or audio (for test only)
+    public boolean selectingVideo = true;
+
+
     private static final String LOG_TAG = "AndroidExample";
 
     public FileSelect delegate = null;
@@ -74,10 +79,37 @@ public class FileChooserFragment extends Fragment {
 
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
-                        .setDataAndType(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, "video/*")
-                        .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                startActivityForResult(intent, REQUEST_CODE_PICK);
+
+                if (selectingVideo)
+                {
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
+                            .setDataAndType(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, "video/*")
+                            .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    startActivityForResult(intent, REQUEST_CODE_PICK);
+
+                }
+                else
+                {
+                    /*
+                    // https://stackoverflow.com/questions/23777501/intent-action-pick-crashed-with-type-audio
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)
+                            .setDataAndType(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, "audio/*")
+                            .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
+                    startActivityForResult(intent, REQUEST_CODE_PICK);
+                    */
+
+                    // This worked but returned uri doesnt work for soundpool
+                    // interesting ... doesnt android support Action.pick for audio?
+                    Intent intent_upload = new Intent();
+                    intent_upload.setType("audio/*");
+
+
+                    intent_upload.setAction(Intent.ACTION_GET_CONTENT);
+
+
+                    //intent_upload.setAction(Intent.ACTION_PICK);
+                    startActivityForResult(intent_upload,REQUEST_CODE_PICK);
+                }
             }
 
         });
@@ -92,20 +124,35 @@ public class FileChooserFragment extends Fragment {
         if (requestCode == REQUEST_CODE_PICK
                 && resultCode == RESULT_OK
                 && data != null) {
-            if (data.getClipData() != null) {
-                ClipData clipData = data.getClipData();
-                List<Uri> uris = new ArrayList<>();
-                for (int i = 0; i < clipData.getItemCount(); i++) {
-                    uris.add(clipData.getItemAt(i).getUri());
+
+            if (selectingVideo)
+            {
+                if (data.getClipData() != null) {
+                    ClipData clipData = data.getClipData();
+                    List<Uri> uris = new ArrayList<>();
+                    for (int i = 0; i < clipData.getItemCount(); i++) {
+                        uris.add(clipData.getItemAt(i).getUri());
+                    }
+
+
+                    delegate.selectedFiles(uris.toArray(new Uri[0]));
+                    // transcode(uris.toArray(new Uri[0]));
+                } else if (data.getData() != null) {
+                    // transcode(data.getData());
+                    delegate.selectedFiles(data.getData());
                 }
 
-
-                delegate.selectedFiles(uris.toArray(new Uri[0]));
-                // transcode(uris.toArray(new Uri[0]));
-            } else if (data.getData() != null) {
-                // transcode(data.getData());
-                delegate.selectedFiles(data.getData());
             }
+            else
+            {
+                // It seems selecting audio is somehow different
+                // and soundpool doesnt like the uri returned from uri.getPath(
+                // ContentResolver contentResolver = delegate.getContentResolver();
+                String path = FileHelper.getRealPathFromURI(getContext(), data.getData());
+                delegate.selectedFile( path );
+            }
+
+
         }
 
         /*
